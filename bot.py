@@ -4,7 +4,7 @@ import os
 from http.server import HTTPServer, BaseHTTPRequestHandler
 import sqlite3
 from datetime import datetime, timezone, timedelta
-from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
+from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, ReplyKeyboardMarkup, KeyboardButton
 from telegram.ext import (
     ApplicationBuilder,
     CommandHandler,
@@ -447,11 +447,26 @@ async def send_reminder(context: ContextTypes.DEFAULT_TYPE):
         logging.error(f"Ошибка напоминания {user_id}: {e}")
 
 
+
+async def handle_menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    text = update.message.text
+    if text == "➕ Добавить таблетку":
+        return await add_start(update, context)
+    elif text == "📋 Мои таблетки":
+        return await list_pills(update, context)
+    elif text == "✅ Выпил":
+        return await took_cmd(update, context)
+    elif text == "🗑 Удалить":
+        return await delete_cmd(update, context)
+    elif text == "🌍 Часовой пояс":
+        return await timezone_cmd(update, context)
+
+
 # ── Запуск ────────────────────────────────────────────────────────────────────
 
 def main():
     init_db()
-    app = ApplicationBuilder().token(TELEGRAM_TOKEN).build()
+    app = ApplicationBuilder().token(TELEGRAM_TOKEN).updater(None).build()
 
     add_handler = ConversationHandler(
         entry_points=[CommandHandler("add", add_start)],
@@ -473,6 +488,7 @@ def main():
     app.add_handler(CallbackQueryHandler(timezone_callback, pattern="^tz_"))
     app.add_handler(CallbackQueryHandler(took_callback, pattern="^took_"))
     app.add_handler(CallbackQueryHandler(delete_callback, pattern="^del_"))
+    app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_menu))
 
     keep_alive()
     print("💊 Выпил? — бот запущен...")
