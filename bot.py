@@ -466,7 +466,7 @@ async def handle_menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 def main():
     init_db()
-    app = ApplicationBuilder().token(TELEGRAM_TOKEN).updater(None).build()
+    app = ApplicationBuilder().token(TELEGRAM_TOKEN).build()
 
     add_handler = ConversationHandler(
         entry_points=[CommandHandler("add", add_start)],
@@ -492,7 +492,7 @@ def main():
 
     keep_alive()
     print("💊 Выпил? — бот запущен...")
-    app.run_polling()
+    app.run_polling(drop_pending_updates=True)
 
 
 if __name__ == "__main__":
