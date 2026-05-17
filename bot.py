@@ -451,7 +451,7 @@ async def send_reminder(context: ContextTypes.DEFAULT_TYPE):
 
 def main():
     init_db()
-    app = ApplicationBuilder().token(TELEGRAM_TOKEN).updater(None).build()
+    app = ApplicationBuilder().token(TELEGRAM_TOKEN).build()
 
     add_handler = ConversationHandler(
         entry_points=[CommandHandler("add", add_start)],
