@@ -200,8 +200,9 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     c.execute("SELECT user_id FROM users WHERE user_id=?", (user_id,))
     exists = c.fetchone()
     conn.close()
-
-   if exists:
+    
+    
+    if exists:
         await update.message.reply_text(
             "Привет! 💊 Выбери действие 👇",
             reply_markup=ReplyKeyboardMarkup(
