@@ -201,14 +201,17 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     exists = c.fetchone()
     conn.close()
 
-    if exists:
+   if exists:
         await update.message.reply_text(
-            "Привет! 💊\n\n"
-            "➕ /add — добавить таблетку\n"
-            "📋 /list — мои таблетки\n"
-            "✅ /took — отметить что выпил\n"
-            "🗑 /delete — удалить таблетку\n"
-            "🌍 /timezone — сменить часовой пояс"
+            "Привет! 💊 Выбери действие 👇",
+            reply_markup=ReplyKeyboardMarkup(
+                [
+                    ["➕ Добавить таблетку", "📋 Мои таблетки"],
+                    ["✅ Выпил", "🗑 Удалить"],
+                    ["🌍 Часовой пояс"],
+                ],
+                resize_keyboard=True,
+            )
         )
     else:
         await ask_timezone(update, context)
