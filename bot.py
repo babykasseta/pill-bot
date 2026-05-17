@@ -1,4 +1,7 @@
 import logging
+import threading
+import os
+from http.server import HTTPServer, BaseHTTPRequestHandler
 import sqlite3
 from datetime import datetime, timezone, timedelta
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
@@ -12,6 +15,21 @@ from telegram.ext import (
     ConversationHandler,
 )
 from config import TELEGRAM_TOKEN
+
+class KeepAliveHandler(BaseHTTPRequestHandler):
+    def do_GET(self):
+        self.send_response(200)
+        self.end_headers()
+        self.wfile.write(b"Bot is alive!")
+    def log_message(self, format, *args):
+        pass
+
+def keep_alive():
+    port = int(os.environ.get("PORT", 8080))
+    server = HTTPServer(("0.0.0.0", port), KeepAliveHandler)
+    thread = threading.Thread(target=server.serve_forever)
+    thread.daemon = True
+    thread.start()
 
 logging.basicConfig(
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
@@ -456,6 +474,7 @@ def main():
     app.add_handler(CallbackQueryHandler(took_callback, pattern="^took_"))
     app.add_handler(CallbackQueryHandler(delete_callback, pattern="^del_"))
 
+    keep_alive()
     print("💊 Выпил? — бот запущен...")
     app.run_polling()
 
